@@ -11,15 +11,15 @@
       <div class="title-container">
         <h3 class="title">Login Form</h3>
       </div>
-      <el-form-item prop="username">
+      <el-form-item prop="loginAccount">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="loginAccount"
+          v-model="loginForm.loginAccount"
+          placeholder="loginAccount"
+          name="loginAccount"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -64,11 +64,11 @@
       >Login</el-button>
       <div style="position:relative">
         <div class="tips">
-          <span>Username : admin</span>
+          <span>loginAccount : admin</span>
           <span>Password : any</span>
         </div>
         <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
+          <span style="margin-right:18px;">loginAccount : editor</span>
           <span>Password : any</span>
         </div>
         <el-button
@@ -93,16 +93,17 @@
   </div>
 </template>
 <script>
-import { validUsername } from '@/utils/validate'
+import { validateLoginAccount } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
 import { login } from '@/api/user'
+import { setToken } from '@/utils/auth'
 
 export default {
   name: 'Login',
   components: { SocialSign },
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+    const validateLogin = (rule, value, callback) => {
+      if (!validateLoginAccount(value)) {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()
@@ -117,11 +118,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        loginAccount: 'admin',
+        password: 'admin123456'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        loginAccount: [{ required: true, trigger: 'blur', validator: validateLogin }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -192,12 +193,18 @@ export default {
           //   .catch(() => {
           //     this.loading = false
           //   })
-          login(this.loginForm.username)
+          login(this.loginForm.loginAccount)
             .then((res) => {
-              console.log(res)
+              if (res.code === 200) {
+                setToken('admin-token')
+                console.log('----')
+                this.$router.push({ path: '/' })
+                this.loading = false
+              }
             })
             .catch((err) => {
               console.log(err)
+              this.loading = false
             })
         } else {
           console.log('error submit!!')

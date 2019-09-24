@@ -44,18 +44,17 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-
+    console.log(res)
     // if the custom code is not 20000, it is judged as an error.
-    if (res.status !== 200) {
-      console.log(res)
+    if (res.code !== 200) {
       Message({
-        message: res.message || 'Error',
+        message: res.message || '未知错误,请联系管理人员',
         type: 'error',
         duration: 5 * 1000
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.status === 401) {
+      if (res.code === 401) {
         console.log(res)
         // to re-login
         MessageBox.confirm(
@@ -72,7 +71,7 @@ service.interceptors.response.use(
           })
         })
       }
-      return Promise.reject(new Error(res.message || 'Error'))
+      return Promise.reject(new Error(res.message || '未知错误,请联系管理人员'))
     } else {
       return res
     }
