@@ -63,11 +63,12 @@ const actions = {
             reject('getInfo: roles must be a non-null array!')
           }
 
+          console.log('get user info')
           commit('SET_ROLES', roles)
           commit('SET_NAME', name)
           commit('SET_AVATAR', avatar)
           commit('SET_INTRODUCTION', introduction)
-          resolve(JSON.parse(data))
+          resolve(data)
         })
         .catch(error => {
           reject(error)
