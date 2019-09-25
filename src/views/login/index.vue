@@ -195,9 +195,9 @@ export default {
           //   })
           login(this.loginForm.loginAccount)
             .then((res) => {
-              if (res.code === 200) {
+              console.log('=====================')
+              if (res.data.code === 200) {
                 setToken('admin-token')
-                console.log('----')
                 this.$router.push({ path: '/' })
                 this.loading = false
               }
