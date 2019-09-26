@@ -18,7 +18,7 @@
         <el-input
           ref="loginAccount"
           v-model="loginForm.loginAccount"
-          placeholder="loginAccount"
+          placeholder="请输入用户名"
           name="loginAccount"
           type="text"
           tabindex="1"
@@ -40,7 +40,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="请输入不低于6位的密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -104,14 +104,14 @@ export default {
   data() {
     const validateLogin = (rule, value, callback) => {
       if (!validateLoginAccount(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('请输入不低于6位的密码'))
       } else {
         callback()
       }
@@ -119,7 +119,7 @@ export default {
     return {
       loginForm: {
         loginAccount: 'admin',
-        password: 'admin123456'
+        password: 'admin123456789'
       },
       loginRules: {
         loginAccount: [{ required: true, trigger: 'blur', validator: validateLogin }],
@@ -193,7 +193,7 @@ export default {
           //   .catch(() => {
           //     this.loading = false
           //   })
-          login(this.loginForm.loginAccount)
+          login(this.loginForm)
             .then((res) => {
               console.log('=====================')
               if (res.data.code === 200) {
