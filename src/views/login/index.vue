@@ -64,12 +64,18 @@
       >Login</el-button>
       <div style="position:relative">
         <div class="tips">
-          <span>loginAccount : admin</span>
-          <span>Password : any</span>
+          <span>忘记密码?</span>
+          <span><a
+            href="javascript:void(0)"
+            @click="updateDialogVisible=true"
+          >点击修改</a></span>
         </div>
         <div class="tips">
-          <span style="margin-right:18px;">loginAccount : editor</span>
-          <span>Password : any</span>
+          <span style="margin-right:18px;">没有账号?</span>
+          <span><a
+            href="javascript:void(0)"
+            @click="dialogVisible=true"
+          >点击注册</a></span>
         </div>
         <el-button
           class="thirdparty-button"
@@ -89,6 +95,117 @@
       <br>
       <br>
       <social-sign />
+    </el-dialog>
+    <el-dialog
+      title="编辑用户信息"
+      :visible.sync="updateDialogVisible"
+      width="30%"
+    >
+      <el-form
+        ref="updateForm"
+        :model="updateForm"
+        status-icon
+        :rules="updateRules"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item
+          label="用户名"
+          prop="loginAccount"
+        >
+          <el-input
+            v-model="updateForm.loginAccount"
+            type="text"
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item
+          label="旧密码"
+          prop="password"
+        >
+          <el-input
+            v-model="updateForm.password"
+            type="password"
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item
+          label="新密码"
+          prop="newPassword"
+        >
+          <el-input
+            v-model="updateForm.newPassword"
+            type="password"
+            autocomplete="false"
+          />
+        </el-form-item>
+      </el-form>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="updateDialogVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="update"
+        >确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 注册 -->
+    <el-dialog
+      title="注册用户"
+      :visible.sync="dialogVisible"
+      width="30%"
+    >
+      <el-form
+        ref="registerForm"
+        :model="registerForm"
+        status-icon
+        :rules="registerRules"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item
+          label="用户名"
+          prop="loginAccount"
+        >
+          <el-input
+            v-model="registerForm.loginAccount"
+            type="text"
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item
+          label="密码"
+          prop="password"
+        >
+          <el-input
+            v-model="registerForm.password"
+            type="password"
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item
+          label="别名"
+          prop="alias"
+        >
+          <el-input
+            v-model="registerForm.alias"
+            type="text"
+            autocomplete="false"
+          />
+        </el-form-item>
+      </el-form>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="register"
+        >确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -116,20 +233,53 @@ export default {
         callback()
       }
     }
+    // const validatePasswordAndNewPassword = (rule, value, callback) => {
+    //   if (value.password === value.newPassword) {
+    //     callback(new Error('新旧密码一致'))
+    //   } else if (value.password.length < 6) {
+    //     callback(new Error('请输入不低于6位的密码'))
+    //   } else if (value.newPassword.length < 6) {
+    //     callback(new Error('请输入不低于6位的密码'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       loginForm: {
         loginAccount: 'admin',
-        password: 'admin123456789'
+        password: 'admin123456'
       },
       loginRules: {
         loginAccount: [{ required: true, trigger: 'blur', validator: validateLogin }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+      },
+      registerForm: {
+        loginAccount: '',
+        password: '',
+        alias: ''
+      },
+      registerRules: {
+        loginAccount: [{ required: true, message: '登录账号不能为空', trigger: 'blur' }],
+        password: [{ required: true, message: '登录尼玛不能为空', trigger: 'blur' }],
+        alias: [{ required: true, message: '别名不能为空', trigger: 'blur' }]
+      },
+      updateForm: {
+        loginAccount: '',
+        password: '',
+        newPassword: ''
+      },
+      updateRules: {
+        loginAccount: [{ required: true, message: '登录账号不能为空', trigger: 'blur' }],
+        password: [{ required: true, message: '旧密码不能为空', trigger: 'blur' }],
+        newPassword: [{ required: true, message: '新密码不能为空', trigger: 'blur' }]
       },
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
+      dialogVisible: false,
+      updateDialogVisible: false,
       otherQuery: {}
     }
   },
@@ -149,9 +299,19 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
+    if (this.loginForm.loginAccount === '') {
+      this.$refs.loginAccount.focus()
     } else if (this.loginForm.password === '') {
+      this.$refs.password.focus()
+    }
+    if (this.registerForm.loginAccount === '') {
+      this.$refs.loginAccount.focus()
+    } else if (this.registerForm.password === '') {
+      this.$refs.password.focus()
+    }
+    if (this.updateForm.loginAccount === '') {
+      this.$refs.loginAccount.focus()
+    } else if (this.updateForm.password === '') {
       this.$refs.password.focus()
     }
   },
@@ -159,6 +319,19 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    register() {
+      alert('注册')
+    },
+    update() {
+      alert('修改用户信息')
+    },
+    // handleClose(done) {
+    //   this.$confirm('确认关闭？')
+    //     .then(_ => {
+    //       done()
+    //     })
+    //     .catch(_ => { })
+    // },
     checkCapslock({ shiftKey, key } = {}) {
       if (key && key.length === 1) {
         if (shiftKey && (key >= 'a' && key <= 'z') || !shiftKey && (key >= 'A' && key <= 'Z')) {
@@ -195,7 +368,6 @@ export default {
           //   })
           login(this.loginForm)
             .then((res) => {
-              console.log('=====================')
               if (res.data.code === 200) {
                 setToken('admin-token')
                 this.$router.push({ path: '/' })
